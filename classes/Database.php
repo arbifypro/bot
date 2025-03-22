@@ -26,4 +26,12 @@ class Database {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getFile($fileName) {
+        $sql = "SELECT * FROM documents WHERE name = :name";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':name', $fileName);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

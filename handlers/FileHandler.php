@@ -29,10 +29,7 @@ class FileHandler {
     }
 
     public function downloadFile($fileName) {
-        $stmt = $this->db->prepare("SELECT * FROM documents WHERE name = :name");
-        $stmt->bindParam(':name', $fileName);
-        $stmt->execute();
-        $file = $stmt->fetch(PDO::FETCH_ASSOC);
+        $file = $this->db->getFile($fileName);
 
         if (!$file) {
             $this->bot->sendMessage($this->chatId, "Файл не знайдений.");

@@ -23,6 +23,7 @@ class FileHandler {
         foreach ($files as $file) {
             $keyboard['keyboard'][] = [['text' => $file['name']]];
         }
+        $keyboard['keyboard'][] = [['text' => '⬅️ Назад']];
         $keyboard['resize_keyboard'] = true;
 
         $this->bot->sendMessage($this->chatId, "Оберіть файл для завантаження:", $keyboard);

@@ -1,37 +1,44 @@
 <?php
 require 'config.php';
 require 'classes/TelegramBot.php';
-require 'classes/MenuHandler.php';
-require 'classes/Database.php';  // Підключаємо клас бази даних
+require 'classes/Database.php';
+require 'handlers/MenuHandler.php';
+require 'handlers/FileHandler.php';
+require 'handlers/ContactHandler.php';
 
 $bot = new TelegramBot(BOT_TOKEN);
-$db = new Database();  // Створюємо об'єкт бази даних
 
-// Зберігаємо останній оброблений update_id
+try {
+    $db = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, DB_USER, DB_PASSWORD);
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Підключення до бази даних не вдалося: " . $e->getMessage());
+}
+
 $lastUpdateId = 0;
 
 while (true) {
-    // Отримання оновлень з Telegram API, використовуючи параметр offset
     $response = file_get_contents('https://api.telegram.org/bot' . BOT_TOKEN . '/getUpdates?offset=' . ($lastUpdateId + 1));
     $updates = json_decode($response, true);
 
-    // Якщо є нові повідомлення
     if (isset($updates['result'])) {
         foreach ($updates['result'] as $update) {
             if (isset($update['message'])) {
                 $chatId = $update['message']['chat']['id'];
                 $text = $update['message']['text'];
 
-                // Оновлюємо останній оброблений update_id
                 $lastUpdateId = $update['update_id'];
 
-                // Створення обробника меню і передача об'єкта бази даних
-                $menuHandler = new MenuHandler($bot, $chatId, $db);  // Тепер передаємо три параметри
+                $menuHandler = new MenuHandler($bot, $chatId, YOUR_USER_ID);
                 $menuHandler->handleMessage($text);
+
+                if (isset($update['message']['document'])) {
+                    $fileHandler = new FileHandler($bot, $db);
+                    $fileHandler->handleDocument($update['message']['document'], $chatId);
+                }
             }
         }
     }
 
-    // Затримка для запобігання надмірного навантаження на сервер
     sleep(1);
 }

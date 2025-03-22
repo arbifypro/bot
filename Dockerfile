@@ -7,7 +7,10 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && docker-php-ext-install zip
 
-RUN apt-get update && apt-get install -y libmysqlclient-dev
+# Встановлюємо бібліотеку для підтримки MySQL/MariaDB
+RUN apt-get update && apt-get install -y libmariadb-dev
+
+# Встановлюємо розширення для PDO та MySQL
 RUN docker-php-ext-install pdo_mysql
 
 # Копіюємо ваші файли в контейнер

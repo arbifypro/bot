@@ -36,8 +36,6 @@ class MenuHandler {
                 $fileHandler = new FileHandler($this->bot, $this->chatId);
                 $fileHandler->showFiles();
                 break;
-            default:
-                $this->bot->sendMessage($this->chatId, "Невідома команда. Використовуйте /menu для перегляду меню.");
         }
     }
 

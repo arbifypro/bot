@@ -20,6 +20,6 @@ class ContactHandler
             $contactList .= $contact['name'] . "\n";
             $contactList .= $contact['phone'] . "\n";
         }
-        $this->bot->sendMessage($this->chatId, "Контакти частини:\n\n" . $contactList);
+        $this->bot->sendMessage($this->chatId, "Номери телефонів частини по напрямкам роботи:\n" . $contactList);
     }
 }

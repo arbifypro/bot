@@ -8,12 +8,7 @@ require 'handlers/ContactHandler.php';
 
 $bot = new TelegramBot(BOT_TOKEN);
 
-try {
-    $db = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, DB_USER, DB_PASSWORD);
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Підключення до бази даних не вдалося: " . $e->getMessage());
-}
+$db = new Database();
 
 $lastUpdateId = 0;
 
@@ -29,7 +24,7 @@ while (true) {
 
                 $lastUpdateId = $update['update_id'];
 
-                $menuHandler = new MenuHandler($bot, $chatId, YOUR_USER_ID);
+                $menuHandler = new MenuHandler($bot, $chatId, $db);
                 $menuHandler->handleMessage($text);
 
                 if (isset($update['message']['document'])) {

@@ -2,8 +2,10 @@
 require 'config.php';
 require 'classes/TelegramBot.php';
 require 'classes/MenuHandler.php';
+require 'classes/Database.php';  // Підключаємо клас бази даних
 
 $bot = new TelegramBot(BOT_TOKEN);
+$db = new Database();  // Створюємо об'єкт бази даних
 
 // Зберігаємо останній оброблений update_id
 $lastUpdateId = 0;
@@ -23,8 +25,8 @@ while (true) {
                 // Оновлюємо останній оброблений update_id
                 $lastUpdateId = $update['update_id'];
 
-                // Створення обробника меню
-                $menuHandler = new MenuHandler($bot, $chatId);
+                // Створення обробника меню і передача об'єкта бази даних
+                $menuHandler = new MenuHandler($bot, $chatId, $db);  // Тепер передаємо три параметри
                 $menuHandler->handleMessage($text);
             }
         }

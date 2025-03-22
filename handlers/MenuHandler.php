@@ -37,6 +37,9 @@ class MenuHandler {
 //        }
 
         switch ($text) {
+            case '⬅️ Назад':
+                $this->fileHandler->goBackToMainMenu();
+                break;
             case '/menu':
                 $this->showMainMenu();
                 break;
@@ -50,9 +53,6 @@ class MenuHandler {
                 $fileHandler = new FileHandler($this->bot, $this->chatId, $this->db);
                 $fileHandler->showFiles();
                 break;
-            case '⬅️ Назад' :
-                $this->showMainMenu();
-                break;
         }
     }
 
@@ -61,7 +61,7 @@ class MenuHandler {
             'keyboard' => [
                 [['text' => '📞 Контакти частини']],
                 [['text' => '📜 Правила']],
-                [['text' => '📁 Документи']]
+                [['text' => '📁 Зразки заяв та документів']]
             ],
             'resize_keyboard' => true
         ];

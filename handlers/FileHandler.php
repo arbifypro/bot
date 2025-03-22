@@ -4,13 +4,43 @@ class FileHandler {
     private $bot;
     private $chatId;
     private $db;
-    private $userState;
 
-    public function __construct($bot, $chatId, $db) {
+    private $user_id;
+
+    public function __construct($bot, $chatId, $db, $user_id) {
         $this->bot = $bot;
         $this->chatId = $chatId;
         $this->db = $db;
-        $this->userState = [];
+        $this->user_id = $user_id;
+    }
+
+    public function handleMessage($text) {
+        if ($this->isFileInList($text)) {
+            $this->downloadFile($text);
+        } else {
+            return;
+        }
+    }
+
+    private function isFileInList($fileName) {
+        $files = $this->getFilesList();
+        return in_array($fileName, $files);
+    }
+
+    private function getFilesList() {
+        return array_column($this->db->getDocuments(), 'name');
+    }
+
+    private function downloadFile($fileName) {
+        $file = $this->db->getFile($fileName)[0];
+
+        if ($file) {
+            $filePath = __DIR__ . '/../files/' . $file['url'];
+            var_dump($filePath);
+            $this->bot->sendDocument($this->chatId, $filePath);
+        } else {
+            $this->bot->sendMessage($this->chatId, "Файл не знайдено.");
+        }
     }
 
     public function showFiles() {
@@ -28,37 +58,12 @@ class FileHandler {
         $keyboard['keyboard'][] = [['text' => '⬅️ Назад']];
         $keyboard['resize_keyboard'] = true;
 
-        $this->userState[$this->chatId] = 'file_selection';
-
+        $this->userState[$this->user_id] = 'file_selection';
         $this->bot->sendMessage($this->chatId, "Оберіть файл для завантаження або натисніть 'Назад' для повернення в головне меню:", $keyboard);
     }
 
-    public function downloadFile($fileName) {
-        if (!isset($this->userState[$this->chatId]) || $this->userState[$this->chatId] !== 'file_selection') {
-            return;
-        }
-
-        $file = $this->db->getFile($fileName);
-
-        if (!$file) {
-            $this->bot->sendMessage($this->chatId, "Файл не знайдений.");
-            return;
-        }
-
-        $filePath = __DIR__ . '/../files/' . $file['url'];
-
-        if (!file_exists($filePath)) {
-            $this->bot->sendMessage($this->chatId, "Файл не знайдений на сервері.");
-            return;
-        }
-
-        $this->bot->sendDocument($this->chatId, $filePath);
-
-        $this->userState[$this->chatId] = null;
-    }
-
     public function goBackToMainMenu() {
-        $this->userState[$this->chatId] = null;
+        $this->userState[$this->user_id] = null;
 
         $keyboard = [
             'keyboard' => [
@@ -70,17 +75,6 @@ class FileHandler {
         ];
 
         $this->bot->sendMessage($this->chatId, "Виберіть пункт меню:", $keyboard);
-    }
-
-
-    public function handleMessage($text) {
-        if (!isset($this->userState[$this->chatId])) {
-            return;
-        }
-
-        if ($this->userState[$this->chatId] === 'file_selection') {
-            $this->downloadFile($text);
-        }
     }
 }
 

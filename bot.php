@@ -23,12 +23,11 @@ while (true) {
                 $text = $update['message']['text'];
 
                 $lastUpdateId = $update['update_id'];
-
-                $menuHandler = new MenuHandler($bot, $chatId, $db);
+                $fileHandler = new FileHandler($bot, $chatId, $db, $update['message']['from']['id']);
+                $menuHandler = new MenuHandler($bot, $chatId, $db, $update['message']['from']['id'], $fileHandler);
                 $menuHandler->handleMessage($text);
 
                 if (isset($update['message']['text'])) {
-                    $fileHandler = new FileHandler($bot, $chatId, $db);
                     $fileHandler->handleMessage($update['message']['text']);
                 }
             }

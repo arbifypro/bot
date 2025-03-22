@@ -4,6 +4,7 @@ class MenuHandler {
     private $bot;
     private $chatId;
     private $db;
+    private $user_id;
 
     private $contactHandler;
     private $fileHandler;
@@ -22,12 +23,13 @@ class MenuHandler {
 Просимо відноситись до всіх учасників з повагою. 
 Дякуємо за розуміння!💙💛';
 
-    public function __construct($bot, $chatId, $db) {
+    public function __construct($bot, $chatId, $db, $user_id, $fileHandler) {
         $this->bot = $bot;
         $this->chatId = $chatId;
         $this->db = $db;
+        $this->user_id = $user_id;
         $this->contactHandler = new ContactHandler($bot, $chatId, $db);
-        $this->fileHandler = new FileHandler($bot, $chatId, $db);
+        $this->fileHandler = $fileHandler;
     }
 
     public function handleMessage($text) {
@@ -50,8 +52,7 @@ class MenuHandler {
                 $this->bot->sendMessage($this->chatId, $this->rules);
                 break;
             case '📁 Зразки заяв та документів':
-                $fileHandler = new FileHandler($this->bot, $this->chatId, $this->db);
-                $fileHandler->showFiles();
+                $this->fileHandler->showFiles();
                 break;
         }
     }

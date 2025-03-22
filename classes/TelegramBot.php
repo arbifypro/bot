@@ -17,6 +17,24 @@ class TelegramBot {
         $this->request('sendMessage', $data);
     }
 
+    public function sendDocument($chatId, $filePath) {
+        $url = "https://api.telegram.org/bot{$this->token}/sendDocument";
+        $postFields = [
+            'chat_id' => $chatId,
+            'document' => new CURLFile($filePath),
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        return $response;
+    }
+
     private function request($method, $data) {
         $url = $this->apiUrl . $method;
         $options = ['http' => [

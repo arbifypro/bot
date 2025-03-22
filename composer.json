@@ -1,0 +1,15 @@
+{
+    "name": "fcdniproua/tgbot_151",
+    "autoload": {
+        "psr-4": {
+            "Fcdniproua\\Tgbot151\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Alexandr Yemelianov",
+            "email": "fcdnipro268@gmail.com"
+        }
+    ],
+    "require": {}
+}

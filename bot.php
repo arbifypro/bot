@@ -27,9 +27,9 @@ while (true) {
                 $menuHandler = new MenuHandler($bot, $chatId, $db);
                 $menuHandler->handleMessage($text);
 
-                if (isset($update['message']['document'])) {
-                    $fileHandler = new FileHandler($bot, $db);
-                    $fileHandler->handleDocument($update['message']['document'], $chatId);
+                if (isset($update['message']['text'])) {
+                    $fileHandler = new FileHandler($bot, $chatId, $db);
+                    $fileHandler->downloadFile($update['message']['text']);
                 }
             }
         }

@@ -3,16 +3,16 @@
 class FileHandler {
     private $bot;
     private $chatId;
-    private $directory;
+    private $db;
 
-    public function __construct($bot, $chatId, $directory = 'files') {
+    public function __construct($bot, $chatId, $db) {
         $this->bot = $bot;
         $this->chatId = $chatId;
-        $this->directory = $directory;
+        $this->db = $db;
     }
 
     public function showFiles() {
-        $files = array_diff(scandir(__DIR__ . '/../' . $this->directory), array('..', '.'));
+        $files = $this->db->getDocuments($this->chatId);
 
         if (empty($files)) {
             $this->bot->sendMessage($this->chatId, "Немає доступних файлів.");
@@ -21,7 +21,7 @@ class FileHandler {
 
         $keyboard = ['keyboard' => []];
         foreach ($files as $file) {
-            $keyboard['keyboard'][] = [['text' => $file]];
+            $keyboard['keyboard'][] = [['text' => $file['name']]];
         }
         $keyboard['resize_keyboard'] = true;
 
@@ -29,10 +29,20 @@ class FileHandler {
     }
 
     public function downloadFile($fileName) {
-        $filePath = __DIR__ . '/../' . $this->directory . '/' . $fileName;
+        $stmt = $this->db->prepare("SELECT * FROM documents WHERE name = :name");
+        $stmt->bindParam(':name', $fileName);
+        $stmt->execute();
+        $file = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$file) {
+            $this->bot->sendMessage($this->chatId, "Файл не знайдений.");
+            return;
+        }
+
+        $filePath = __DIR__ . '/../files/' . $file['url'];
 
         if (!file_exists($filePath)) {
-            $this->bot->sendMessage($this->chatId, "Файл не знайдений.");
+            $this->bot->sendMessage($this->chatId, "Файл не знайдений на сервері.");
             return;
         }
 

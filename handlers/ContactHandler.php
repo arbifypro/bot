@@ -22,4 +22,14 @@ class ContactHandler
         }
         $this->bot->sendMessage($this->chatId, "Номери телефонів частини по напрямкам роботи:\n" . $contactList);
     }
+
+    public function showRelatedContacts() {
+        $relatedContacts = $this->db->getRelatedContacts();
+        $contactList = "";
+        foreach ($relatedContacts as $contact) {
+            $contactList .= $contact['name'] . "\n";
+            $contactList .= $contact['phone'] . "\n";
+        }
+        $this->bot->sendMessage($this->chatId, "Номери телефонів частини по напрямкам роботи:\n" . $contactList);
+    }
 }

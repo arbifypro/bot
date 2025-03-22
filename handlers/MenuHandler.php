@@ -33,10 +33,6 @@ class MenuHandler {
     }
 
     public function handleMessage($text) {
-//        if ($this->chatId != $this->allowedUserId) {
-//            $this->bot->sendMessage($this->chatId, "Тільки адміністратор може відправляти повідомлення.");
-//            return;
-//        }
 
         switch ($text) {
             case '⬅️ Назад':
@@ -47,6 +43,9 @@ class MenuHandler {
                 break;
             case '📞 Контакти частини':
                 $this->contactHandler->showContacts();
+                break;
+            case '📞 Корисні контакти':
+                $this->contactHandler->showRelatedContacts();
                 break;
             case '📜 Правила':
                 $this->bot->sendMessage($this->chatId, $this->rules);

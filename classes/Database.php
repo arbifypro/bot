@@ -20,6 +20,13 @@ class Database {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getRelatedContacts() {
+        $sql = "SELECT * FROM related_contacts";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getDocuments() {
         $sql = "SELECT * FROM documents";
         $stmt = $this->pdo->prepare($sql);

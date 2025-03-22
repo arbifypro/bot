@@ -46,7 +46,7 @@ class MenuHandler {
             case '📜 Правила':
                 $this->bot->sendMessage($this->chatId, $this->rules);
                 break;
-            case '📁 Документи':
+            case '📁 Зразки заяв та документів':
                 $fileHandler = new FileHandler($this->bot, $this->chatId, $this->db);
                 $fileHandler->showFiles();
                 break;

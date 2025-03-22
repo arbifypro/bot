@@ -45,6 +45,6 @@ class FileHandler {
             return;
         }
 
-        $this->bot->sendDocument($this->chatId, new CURLFile($filePath));
+        $this->bot->sendDocument($this->chatId, $filePath);
     }
 }

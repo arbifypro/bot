@@ -38,8 +38,9 @@ class FileHandler {
 
         $filePath = __DIR__ . '/../files/' . $file['url'];
 
+
         if (!file_exists($filePath)) {
-            $this->bot->sendMessage($this->chatId, "Файл не знайдений на сервері.");
+            $this->bot->sendMessage($this->chatId, $filePath);
             return;
         }
 

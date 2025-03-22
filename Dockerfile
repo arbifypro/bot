@@ -7,6 +7,9 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && docker-php-ext-install zip
 
+RUN apt-get update && apt-get install -y libmysqlclient-dev
+RUN docker-php-ext-install pdo_mysql
+
 # Копіюємо ваші файли в контейнер
 COPY . /app
 

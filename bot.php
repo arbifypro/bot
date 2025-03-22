@@ -29,7 +29,7 @@ while (true) {
 
                 if (isset($update['message']['text'])) {
                     $fileHandler = new FileHandler($bot, $chatId, $db);
-                    $fileHandler->downloadFile($update['message']['text']);
+                    $fileHandler->handleMessage($update['message']['text']);
                 }
             }
         }

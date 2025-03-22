@@ -50,6 +50,9 @@ class MenuHandler {
                 $fileHandler = new FileHandler($this->bot, $this->chatId, $this->db);
                 $fileHandler->showFiles();
                 break;
+            case '⬅️ Назад' :
+                $this->showMainMenu();
+                break;
         }
     }
 

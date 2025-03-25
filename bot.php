@@ -54,11 +54,11 @@ function handleMessage($update, $bot, $db) {
         return;
     }
 
-    $bot->deleteMessage($chatId, $update['message']['']);
     $fileHandler = new FileHandler($bot, $chatId, $db, $userId);
     $menuHandler = new MenuHandler($bot, $chatId, $db, $userId, $fileHandler);
 
     $menuHandler->handleMessage($text);
+    $bot->deleteMessage($chatId, $update['message']['message_id']);
 }
 
 function handleCallback($update, $bot, $db) {

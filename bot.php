@@ -7,32 +7,73 @@ require 'handlers/FileHandler.php';
 require 'handlers/ContactHandler.php';
 
 $bot = new TelegramBot(BOT_TOKEN);
-
 $db = new Database();
 
 $lastUpdateId = 0;
 
 while (true) {
-    $response = file_get_contents('https://api.telegram.org/bot' . BOT_TOKEN . '/getUpdates?offset=' . ($lastUpdateId + 1));
+    $response = getUpdates($lastUpdateId);
     $updates = json_decode($response, true);
 
     if (isset($updates['result'])) {
         foreach ($updates['result'] as $update) {
+            $lastUpdateId = $update['update_id'];
+
             if (isset($update['message'])) {
-                $chatId = $update['message']['chat']['id'];
-                $text = $update['message']['text'];
+                handleMessage($update);
+            }
 
-                $lastUpdateId = $update['update_id'];
-                $fileHandler = new FileHandler($bot, $chatId, $db, $update['message']['from']['id']);
-                $menuHandler = new MenuHandler($bot, $chatId, $db, $update['message']['from']['id'], $fileHandler);
-                $menuHandler->handleMessage($text);
-
-                if (isset($update['message']['text'])) {
-                    $fileHandler->handleMessage($update['message']['text']);
-                }
+            if (isset($update['callback_query'])) {
+                handleCallback($update);
             }
         }
     }
 
     sleep(1);
+}
+
+function getUpdates($offset) {
+    $url = "https://api.telegram.org/bot" . BOT_TOKEN . "/getUpdates?offset=" . ($offset + 1);
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $result = curl_exec($ch);
+    curl_close($ch);
+
+    return $result;
+}
+
+function handleMessage($update) {
+    global $bot, $db;
+
+    $chatId = $update['message']['chat']['id'];
+    $userId = $update['message']['from']['id'];
+    $text = trim($update['message']['text'] ?? '');
+
+    if (empty($text)) {
+        return;
+    }
+
+    $fileHandler = new FileHandler($bot, $chatId, $db, $userId);
+    $menuHandler = new MenuHandler($bot, $chatId, $db, $userId, $fileHandler);
+
+    $menuHandler->handleMessage($text);
+    $fileHandler->handleMessage($text);
+}
+
+function handleCallback($update) {
+    global $bot, $db;
+
+    $callbackQuery = $update['callback_query'];
+    $chatId = $callbackQuery['message']['chat']['id'];
+    $userId = $callbackQuery['from']['id'];
+    $callbackData = $callbackQuery['data'];
+
+    $fileHandler = new FileHandler($bot, $chatId, $db, $userId);
+    $menuHandler = new MenuHandler($bot, $chatId, $db, $userId, $fileHandler);
+
+    $menuHandler->handleCallback($callbackData);
+
+    $bot->answerCallbackQuery($callbackQuery['id']);
 }

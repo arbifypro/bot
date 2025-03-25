@@ -5,6 +5,7 @@ class FileHandler {
     private $chatId;
     private $db;
     private $user_id;
+    private $filesPerPage = 5;
 
     public function __construct($bot, $chatId, $db, $user_id) {
         $this->bot = $bot;
@@ -13,7 +14,7 @@ class FileHandler {
         $this->user_id = $user_id;
     }
 
-    public function showFiles() {
+    public function showFiles($page = 1) {
         $files = $this->db->getDocuments($this->chatId);
 
         if (empty($files)) {
@@ -21,53 +22,51 @@ class FileHandler {
             return;
         }
 
-        $keyboard = ['inline_keyboard' => []];
-        foreach ($files as $file) {
-            $keyboard['inline_keyboard'][] = [['text' => $file['name'], 'callback_data' => 'file_' . $file['name']]];
-        }
-        $keyboard['inline_keyboard'][] = [['text' => '⬅️ Назад', 'callback_data' => 'go_back']];
+        $start = ($page - 1) * $this->filesPerPage;
+        $filesToShow = array_slice($files, $start, $this->filesPerPage);
 
-        $this->bot->sendMessage($this->chatId, "📌 *Оберіть файл для завантаження:*", [
-            'reply_markup' => json_encode($keyboard),
-            'parse_mode' => 'Markdown'
-        ]);
+
+        $keyboard = ['inline_keyboard' => []];
+        foreach ($filesToShow as $file) {
+            $keyboard['inline_keyboard'][] = [['text' => $file['name'], 'callback_data' => 'file_' . $file['id']]];
+        }
+
+        $pagination = [];
+        if ($page > 1) {
+            $pagination[] = ['text' => '◀ Назад', 'callback_data' => 'page_' . ($page - 1)];
+        }
+        if (($page * $this->filesPerPage) < count($files)) {
+            $pagination[] = ['text' => 'Вперед ▶', 'callback_data' => 'page_' . ($page + 1)];
+        }
+
+        $pagination[] = ['text' => 'Головне меню', 'callback_data' => 'go_back'];
+        $keyboard['inline_keyboard'][] = $pagination;
+
+        $this->bot->sendMessage($this->chatId, "📌 *Оберіть файл для завантаження:*", $keyboard);
     }
 
     public function handleCallback($callbackData) {
-        if ($callbackData === 'go_back') {
-            $this->goBackToMainMenu();
-        } elseif (strpos($callbackData, 'file_') === 0) {
-            $fileName = substr($callbackData, 5);
-            $this->downloadFile($fileName);
+        if (strpos($callbackData, 'file_') === 0) {
+            $fileId = substr($callbackData, 5);
+            $this->downloadFile($fileId);
+        }
+
+        if (strpos($callbackData, 'page_') === 0) {
+            $page = (int)substr($callbackData, 5);
+            $this->showFiles($page);
         }
     }
 
-    private function downloadFile($fileName) {
-        $file = $this->db->getFile($fileName)[0];
+    private function downloadFile($fileId) {
+        var_dump($fileId);
+        $file = $this->db->getFile($fileId)[0];
 
         if ($file) {
             $filePath = __DIR__ . '/../files/' . $file['url'];
+            var_dump($filePath);
             $this->bot->sendDocument($this->chatId, $filePath);
         } else {
-            $this->bot->sendMessage($this->chatId, "❌ Файл не знайдено.", [
-                'parse_mode' => 'Markdown'
-            ]);
+            $this->bot->sendMessage($this->chatId, "❌ Файл не знайдено.");
         }
-    }
-
-    public function goBackToMainMenu() {
-        $keyboard = [
-            'inline_keyboard' => [
-                [['text' => '📞 Контакти частини', 'callback_data' => 'contacts']],
-                [['text' => '📞 Корисні контакти', 'callback_data' => 'related_contacts']],
-                [['text' => '📜 Правила', 'callback_data' => 'rules']],
-                [['text' => '📁 Зразки заяв та документів', 'callback_data' => 'files']]
-            ]
-        ];
-
-        $this->bot->sendMessage($this->chatId, "📌 *Головне меню:*", [
-            'reply_markup' => json_encode($keyboard),
-            'parse_mode' => 'Markdown'
-        ]);
     }
 }

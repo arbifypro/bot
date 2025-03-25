@@ -34,10 +34,10 @@ class Database {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getFile($fileName) {
-        $sql = "SELECT * FROM documents WHERE name = :name";
+    public function getFile($fileId) {
+        $sql = "SELECT * FROM documents WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam(':name', $fileName);
+        $stmt->bindParam(':id', $fileId);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

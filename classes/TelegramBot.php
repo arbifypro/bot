@@ -12,9 +12,22 @@ class TelegramBot {
     public function sendMessage($chatId, $text, $replyMarkup = null) {
         $data = ['chat_id' => $chatId, 'text' => $text, 'parse_mode' => 'HTML'];
         if ($replyMarkup) {
-            $data['reply_markup'] = json_encode($replyMarkup);
+            $data['reply_markup'] = json_encode($replyMarkup, JSON_UNESCAPED_UNICODE);
         }
         $this->request('sendMessage', $data);
+    }
+
+    public function deleteMessage($chatId, $messageId) {
+        sleep(15);
+
+        var_dump(111);
+        $url = $this->apiUrl . "deleteMessage";
+        $data = [
+            'chat_id' => $chatId,
+            'message_id' => $messageId
+        ];
+
+        return $this->sendRequest($url, $data);
     }
 
     public function sendDocument($chatId, $filePath) {
@@ -34,6 +47,17 @@ class TelegramBot {
 
         return $response;
     }
+
+    public function answerCallbackQuery($callbackQueryId, $text = '', $showAlert = false) {
+        $data = [
+            'callback_query_id' => $callbackQueryId,
+            'text' => $text,
+            'show_alert' => $showAlert
+        ];
+
+        $this->request('answerCallbackQuery', $data);
+    }
+
 
     private function request($method, $data) {
         $url = $this->apiUrl . $method;

@@ -1,4 +1,5 @@
 <?php
+
 require 'config.php';
 require 'classes/TelegramBot.php';
 require 'classes/Database.php';
@@ -20,11 +21,11 @@ while (true) {
             $lastUpdateId = $update['update_id'];
 
             if (isset($update['message'])) {
-                handleMessage($update);
+                handleMessage($update, $bot, $db);
             }
 
             if (isset($update['callback_query'])) {
-                handleCallback($update);
+                handleCallback($update, $bot, $db);
             }
         }
     }
@@ -44,9 +45,7 @@ function getUpdates($offset) {
     return $result;
 }
 
-function handleMessage($update) {
-    global $bot, $db;
-
+function handleMessage($update, $bot, $db) {
     $chatId = $update['message']['chat']['id'];
     $userId = $update['message']['from']['id'];
     $text = trim($update['message']['text'] ?? '');
@@ -55,24 +54,26 @@ function handleMessage($update) {
         return;
     }
 
+    $bot->deleteMessage($chatId, $update['message']['']);
     $fileHandler = new FileHandler($bot, $chatId, $db, $userId);
     $menuHandler = new MenuHandler($bot, $chatId, $db, $userId, $fileHandler);
 
     $menuHandler->handleMessage($text);
 }
 
-function handleCallback($update) {
-    global $bot, $db;
-
+function handleCallback($update, $bot, $db) {
     $callbackQuery = $update['callback_query'];
     $chatId = $callbackQuery['message']['chat']['id'];
     $userId = $callbackQuery['from']['id'];
     $callbackData = $callbackQuery['data'];
 
     $fileHandler = new FileHandler($bot, $chatId, $db, $userId);
+    $contactHandler = new ContactHandler($bot, $chatId, $db);
     $menuHandler = new MenuHandler($bot, $chatId, $db, $userId, $fileHandler);
 
     $menuHandler->handleCallback($callbackData);
+    $fileHandler->handleCallback($callbackData);
+    $contactHandler->handleCallback($callbackData);
 
     $bot->answerCallbackQuery($callbackQuery['id']);
 }

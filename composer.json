@@ -11,5 +11,7 @@
             "email": "fcdnipro268@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+      "ext-curl": "*"
+    }
 }

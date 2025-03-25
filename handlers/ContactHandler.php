@@ -15,25 +15,20 @@ class ContactHandler
     public function showContactsMenu() {
         $keyboard = [
             'inline_keyboard' => [
-                [['text' => '📞 Контакти частини', 'callback_data' => 'contacts']],
+                [['text' => '📞 Контакти частини', 'callback_data' => 'contacts_151']],
                 [['text' => '📞 Корисні контакти', 'callback_data' => 'related_contacts']],
                 [['text' => '⬅️ Назад', 'callback_data' => 'go_back']]
             ]
         ];
 
-        $this->bot->sendMessage($this->chatId, "📌 *Оберіть тип контактів:*", [
-            'reply_markup' => json_encode($keyboard),
-            'parse_mode' => 'Markdown'
-        ]);
+        $this->bot->sendMessage($this->chatId, "📌 *Оберіть тип контактів:*", $keyboard);
     }
 
     public function handleCallback($callbackData) {
-        if ($callbackData === 'contacts') {
+        if ($callbackData === 'contacts_151') {
             $this->showContacts();
         } elseif ($callbackData === 'related_contacts') {
             $this->showRelatedContacts();
-        } elseif ($callbackData === 'go_back') {
-            $this->goBackToMainMenu();
         }
     }
 
@@ -46,7 +41,7 @@ class ContactHandler
 
         $contactList = "📞 *Контакти частини:*\n\n";
         foreach ($contacts as $contact) {
-            $contactList .= "🔹 *" . $contact['name'] . "*\n📱 " . $contact['phone'] . "\n\n";
+            $contactList .= $contact['name'] . "\n📱 " . $contact['phone'] . "\n\n";
         }
 
         $this->bot->sendMessage($this->chatId, $contactList, ['parse_mode' => 'Markdown']);
@@ -61,25 +56,9 @@ class ContactHandler
 
         $contactList = "📞 *Корисні контакти:*\n\n";
         foreach ($relatedContacts as $contact) {
-            $contactList .= "🔹 *" . $contact['name'] . "*\n📱 " . $contact['phone'] . "\n\n";
+            $contactList .= $contact['name'] . "\n📱 " . $contact['phone'] . "\n\n";
         }
 
         $this->bot->sendMessage($this->chatId, $contactList, ['parse_mode' => 'Markdown']);
-    }
-
-    private function goBackToMainMenu() {
-        $keyboard = [
-            'inline_keyboard' => [
-                [['text' => '📞 Контакти частини', 'callback_data' => 'contacts']],
-                [['text' => '📞 Корисні контакти', 'callback_data' => 'related_contacts']],
-                [['text' => '📜 Правила', 'callback_data' => 'rules']],
-                [['text' => '📁 Зразки заяв та документів', 'callback_data' => 'files']]
-            ]
-        ];
-
-        $this->bot->sendMessage($this->chatId, "📌 *Головне меню:*", [
-            'reply_markup' => json_encode($keyboard),
-            'parse_mode' => 'Markdown'
-        ]);
     }
 }

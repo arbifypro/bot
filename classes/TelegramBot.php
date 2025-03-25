@@ -20,14 +20,13 @@ class TelegramBot {
     public function deleteMessage($chatId, $messageId) {
         sleep(15);
 
-        var_dump(111);
         $url = $this->apiUrl . "deleteMessage";
         $data = [
             'chat_id' => $chatId,
             'message_id' => $messageId
         ];
 
-        return $this->sendRequest($url, $data);
+        return $this->request($url, $data);
     }
 
     public function sendDocument($chatId, $filePath) {

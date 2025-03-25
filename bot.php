@@ -59,7 +59,6 @@ function handleMessage($update) {
     $menuHandler = new MenuHandler($bot, $chatId, $db, $userId, $fileHandler);
 
     $menuHandler->handleMessage($text);
-    $fileHandler->handleMessage($text);
 }
 
 function handleCallback($update) {

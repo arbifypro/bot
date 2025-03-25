@@ -58,13 +58,16 @@ class FileHandler {
     }
 
     private function downloadFile($fileId) {
-        var_dump($fileId);
         $file = $this->db->getFile($fileId)[0];
 
         if ($file) {
             $filePath = __DIR__ . '/../files/' . $file['url'];
-            var_dump($filePath);
-            $this->bot->sendDocument($this->chatId, $filePath);
+            $response = $this->bot->sendDocument($this->chatId, $filePath);
+            $responseData = json_decode($response, true);
+            if (isset($responseData['result']['message_id'])) {
+                $messageId = $responseData['result']['message_id'];
+                $this->bot->scheduleDelete($this->chatId, $messageId);
+            }
         } else {
             $this->bot->sendMessage($this->chatId, "❌ Файл не знайдено.");
         }

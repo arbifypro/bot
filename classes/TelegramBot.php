@@ -22,7 +22,7 @@ class TelegramBot {
         }
     }
 
-    private function scheduleDelete($chatId, $messageId) {
+    public function scheduleDelete($chatId, $messageId) {
         $command = "php " . __DIR__ . "/DeleteMessage.php $chatId $messageId > /dev/null 2>&1 &";
         shell_exec($command);
     }

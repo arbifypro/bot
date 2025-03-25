@@ -14,7 +14,12 @@ class TelegramBot {
         if ($replyMarkup) {
             $data['reply_markup'] = json_encode($replyMarkup, JSON_UNESCAPED_UNICODE);
         }
-        $this->request('sendMessage', $data);
+        $response = $this->request('sendMessage', $data);
+        $responseData = json_decode($response, true);
+        if (isset($responseData['result']['message_id'])) {
+            $messageId = $responseData['result']['message_id'];
+            $this->deleteMessage($chatId, $messageId);
+        }
     }
 
     public function deleteMessage($chatId, $messageId) {
@@ -64,6 +69,6 @@ class TelegramBot {
             'method'  => 'POST',
             'content' => json_encode($data)
         ]];
-        file_get_contents($url, false, stream_context_create($options));
+        return file_get_contents($url, false, stream_context_create($options));
     }
 }

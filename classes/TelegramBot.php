@@ -18,8 +18,13 @@ class TelegramBot {
         $responseData = json_decode($response, true);
         if (isset($responseData['result']['message_id'])) {
             $messageId = $responseData['result']['message_id'];
-            $this->deleteMessage($chatId, $messageId);
+            $this->scheduleDelete($chatId, $messageId);
         }
+    }
+
+    private function scheduleDelete($chatId, $messageId) {
+        $command = "php " . __DIR__ . "/DeleteMessage.php $chatId $messageId > /dev/null 2>&1 &";
+        shell_exec($command);
     }
 
     public function deleteMessage($chatId, $messageId) {

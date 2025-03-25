@@ -24,7 +24,6 @@ class TelegramBot {
 
     public function deleteMessage($chatId, $messageId) {
         sleep(15);
-
         $data = [
             'chat_id' => $chatId,
             'message_id' => $messageId

@@ -28,44 +28,50 @@ class MenuHandler {
         $this->chatId = $chatId;
         $this->db = $db;
         $this->user_id = $user_id;
-        $this->contactHandler = new ContactHandler($bot, $chatId, $db);
+        $this->contactHandler = new ContactHandler($this->bot, $this->chatId, $this->db);
         $this->fileHandler = $fileHandler;
     }
 
     public function handleMessage($text) {
-
         switch ($text) {
-            case '⬅️ Назад':
-                $this->fileHandler->goBackToMainMenu();
-                break;
             case '/menu':
                 $this->showMainMenu();
-                break;
-            case '📞 Контакти частини':
-                $this->contactHandler->showContacts();
-                break;
-            case '📞 Корисні контакти':
-                $this->contactHandler->showRelatedContacts();
-                break;
-            case '📜 Правила':
-                $this->bot->sendMessage($this->chatId, $this->rules);
-                break;
-            case '📁 Зразки заяв та документів':
-                $this->fileHandler->showFiles();
                 break;
         }
     }
 
     private function showMainMenu() {
         $keyboard = [
-            'keyboard' => [
-                [['text' => '📞 Контакти частини']],
-                [['text' => '📞 Корисні контакти']],
-                [['text' => '📜 Правила']],
-                [['text' => '📁 Зразки заяв та документів']]
-            ],
-            'resize_keyboard' => true
+            'inline_keyboard' => [
+                [['text' => '📞 Контакти частини', 'callback_data' => 'contacts']],
+                [['text' => '📞 Корисні контакти', 'callback_data' => 'related_contacts']],
+                [['text' => '📜 Правила', 'callback_data' => 'rules']],
+                [['text' => '📁 Зразки заяв та документів', 'callback_data' => 'files']]
+            ]
         ];
-        $this->bot->sendMessage($this->chatId, "Виберіть пункт меню:", $keyboard);
+        $this->bot->sendMessage($this->chatId, "📌 *Головне меню:*\nОберіть пункт:", [
+            'reply_markup' => json_encode($keyboard),
+            'parse_mode' => 'Markdown'
+        ]);
     }
+
+    public function handleCallback($callbackData) {
+        switch ($callbackData) {
+            case 'contacts':
+                $this->contactHandler->showContactsMenu();
+                break;
+            case 'rules':
+                $this->bot->sendMessage($this->chatId, $this->rules, ['parse_mode' => 'Markdown']);
+                break;
+            case 'files':
+                $this->fileHandler->showFiles();
+                break;
+            default:
+                if (strpos($callbackData, 'category_') === 0) {
+                    $this->contactHandler->handleCallback($callbackData);
+                }
+                break;
+        }
+    }
+
 }

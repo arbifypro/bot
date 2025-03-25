@@ -48,7 +48,7 @@ function getUpdates($offset) {
 function handleMessage($update, $bot, $db) {
     $chatId = $update['message']['chat']['id'];
     if ($chatId > 0) {
-        $bot->sendMessage($chatId, "Користування ботом можливе лище у загальному чаті.",);
+        $bot->sendMessage($chatId, "Користування ботом можливе лише у загальному чаті.",);
     }
     $userId = $update['message']['from']['id'];
     $text = trim($update['message']['text'] ?? '');

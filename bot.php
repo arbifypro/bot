@@ -6,6 +6,7 @@ require 'classes/Database.php';
 require 'handlers/MenuHandler.php';
 require 'handlers/FileHandler.php';
 require 'handlers/ContactHandler.php';
+require 'handlers/LinksHandler.php';
 
 $bot = new TelegramBot(BOT_TOKEN);
 $db = new Database();
@@ -58,8 +59,7 @@ function handleMessage($update, $bot, $db) {
         return;
     }
 
-    $fileHandler = new FileHandler($bot, $chatId, $db, $userId);
-    $menuHandler = new MenuHandler($bot, $chatId, $db, $userId, $fileHandler);
+    $menuHandler = new MenuHandler($bot, $chatId, $db, $userId);
 
     $menuHandler->handleMessage($text);
 }

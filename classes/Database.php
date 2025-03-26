@@ -34,6 +34,20 @@ class Database {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getLinks() {
+        $sql = "SELECT * FROM links";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getAdmins() {
+        $sql = "SELECT * FROM admins";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getFile($fileId) {
         $sql = "SELECT * FROM documents WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);

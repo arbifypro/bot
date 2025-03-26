@@ -8,6 +8,7 @@ class MenuHandler {
 
     private $contactHandler;
     private $fileHandler;
+    private $linksHandler;
 
     private $rules = 'Доброго дня, нагадуємо ,
 що ця група - добровільно створена  для допомоги у вирішенні питань та обміном досвідом та інформацією.
@@ -35,13 +36,14 @@ class MenuHandler {
 Просимо відноситись до всіх учасників з повагою. 
 Дякуємо за розуміння!💙💛';
 
-    public function __construct($bot, $chatId, $db, $user_id, $fileHandler) {
+    public function __construct($bot, $chatId, $db, $user_id, ) {
         $this->bot = $bot;
         $this->chatId = $chatId;
         $this->db = $db;
         $this->user_id = $user_id;
         $this->contactHandler = new ContactHandler($this->bot, $this->chatId, $this->db);
-        $this->fileHandler = $fileHandler;
+        $this->linksHandler = new LinksHandler($this->bot, $this->chatId, $this->db);
+        $this->fileHandler = new FileHandler($bot, $chatId, $db, $user_id);
     }
 
     public function handleMessage($text) {
@@ -58,6 +60,8 @@ class MenuHandler {
                 [['text' => '📞 Контакти', 'callback_data' => 'contacts']],
                 [['text' => '📜 Правила', 'callback_data' => 'rules']],
                 [['text' => '📁 Зразки заяв та документів', 'callback_data' => 'files']],
+                [['text' => '⚡️ Корисні посилання', 'callback_data' => 'links']],
+                [['text' => '🚨 Адміни', 'callback_data' => 'admins']],
             ]
         ];
 
@@ -74,6 +78,10 @@ class MenuHandler {
                 break;
             case 'files':
                 $this->fileHandler->showFiles();
+                break;
+            case 'admins':
+            case 'links':
+                $this->linksHandler->handleCallback($callbackData);
                 break;
             case 'go_back':
                 $this->showMainMenu();

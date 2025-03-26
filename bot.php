@@ -82,11 +82,11 @@ function handleCallback($update, $bot, $db) {
 }
 
 function setChatMenuButton() {
-    $url = "https://api.telegram.org/bot" . BOT_TOKEN . "/setChatMenuButton";
+    $url = "https://api.telegram.org/bot" . BOT_TOKEN . "/setMyCommands";
 
     $data = [
-        'menu_button' => [
-            'type' => 'commands'
+        'commands' => [
+            ['command' => '/допомога', 'description' => '📋 Відкрити меню']
         ]
     ];
 

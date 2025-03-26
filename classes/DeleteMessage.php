@@ -6,11 +6,15 @@ require 'classes/TelegramBot.php';
 $bot = new TelegramBot(BOT_TOKEN);
 
 if ($argc < 3) {
-    exit("Usage: php deleteMessage.php <chat_id> <message_id>\n");
+    exit("Usage: php deleteMessage.php <chat_id> <message_id> \n");
 }
 
 $chatId = $argv[1];
 $messageId = $argv[2];
-
-sleep(15); // Чекаємо 20 хвилин
+$time = $argv[3];
+var_dump($time);
+if ($time == null) {
+    $time = 600;
+}
+sleep($time); // Чекаємо 20 хвилин
 $bot->deleteMessage($chatId, $messageId);

@@ -48,6 +48,7 @@ function getUpdates($offset) {
 
 function handleMessage($update, $bot, $db) {
     $chatId = $update['message']['chat']['id'];
+    $messageId = $update['message']['message_id'];
     if ($chatId > 0) {
         $bot->sendMessage($chatId, "Користування ботом можливе лише у загальному чаті.");
         return;
@@ -58,6 +59,10 @@ function handleMessage($update, $bot, $db) {
     if (empty($text)) {
         return;
     }
+    if ($text == '/help@fcdniproua_bot') {
+        $bot->scheduleDelete($chatId, $messageId, 10);
+    }
+
 
     $menuHandler = new MenuHandler($bot, $chatId, $db, $userId);
 

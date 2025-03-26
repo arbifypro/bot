@@ -36,7 +36,7 @@ class MenuHandler {
 Просимо відноситись до всіх учасників з повагою. 
 Дякуємо за розуміння!💙💛';
 
-    public function __construct($bot, $chatId, $db, $user_id, ) {
+    public function __construct($bot, $chatId, $db, $user_id) {
         $this->bot = $bot;
         $this->chatId = $chatId;
         $this->db = $db;

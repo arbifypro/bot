@@ -50,7 +50,7 @@ class LinksHandler
         foreach ($admins as $admin) {
             $keyboard['inline_keyboard'][] = [[
                 'text' => $admin['name'],
-                'url' => urlencode($admin['username'])
+                'url' => $admin['username']
             ]];
         }
         $keyboard['inline_keyboard'][] = [['text' => '⬅️ Назад', 'callback_data' => 'go_back']];

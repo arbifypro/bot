@@ -12,9 +12,8 @@ if ($argc < 3) {
 $chatId = $argv[1];
 $messageId = $argv[2];
 $time = $argv[3];
-var_dump($time);
 if ($time == null) {
-    $time = 600;
+    $time = 300;
 }
 sleep($time); // Чекаємо 20 хвилин
 $bot->deleteMessage($chatId, $messageId);

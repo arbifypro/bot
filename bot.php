@@ -86,7 +86,7 @@ function setChatMenuButton() {
 
     $data = [
         'commands' => [
-            ['command' => '/допомога', 'description' => '📋 Відкрити меню']
+            ['command' => '/help', 'description' => '📋 Відкрити меню']
         ]
     ];
 
@@ -94,7 +94,7 @@ function setChatMenuButton() {
         'http' => [
             'header'  => "Content-Type: application/json",
             'method'  => 'POST',
-            'content' => json_encode($data),
+            'content' => json_encode($data, JSON_UNESCAPED_UNICODE),
         ]
     ];
 

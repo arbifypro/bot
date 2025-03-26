@@ -46,7 +46,7 @@ class MenuHandler {
 
     public function handleMessage($text) {
         switch ($text) {
-            case '/допомога':
+            case '/help@fcdniproua_bot':
                 $this->showMainMenu();
                 break;
         }

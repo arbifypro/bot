@@ -62,7 +62,6 @@ class MenuHandler {
         ];
 
         $this->bot->sendMessage($this->chatId, "📌 *Головне меню:*\nОберіть пункт:", $keyboard);
-
     }
 
     public function handleCallback($callbackData) {

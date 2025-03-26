@@ -12,6 +12,8 @@ $db = new Database();
 
 $lastUpdateId = 0;
 
+setChatMenuButton();
+
 while (true) {
     $response = getUpdates($lastUpdateId);
     $updates = json_decode($response, true);
@@ -29,12 +31,10 @@ while (true) {
             }
         }
     }
-
-    sleep(1);
 }
 
 function getUpdates($offset) {
-    $url = "https://api.telegram.org/bot" . BOT_TOKEN . "/getUpdates?offset=" . ($offset + 1);
+    $url = "https://api.telegram.org/bot" . BOT_TOKEN . "/getUpdates?offset=" . ($offset + 1) . "&timeout=10";
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
@@ -79,4 +79,25 @@ function handleCallback($update, $bot, $db) {
     $contactHandler->handleCallback($callbackData);
 
     $bot->answerCallbackQuery($callbackQuery['id']);
+}
+
+function setChatMenuButton() {
+    $url = "https://api.telegram.org/bot" . BOT_TOKEN . "/setChatMenuButton";
+
+    $data = [
+        'menu_button' => [
+            'type' => 'commands'
+        ]
+    ];
+
+    $options = [
+        'http' => [
+            'header'  => "Content-Type: application/json",
+            'method'  => 'POST',
+            'content' => json_encode($data),
+        ]
+    ];
+
+    $context  = stream_context_create($options);
+    file_get_contents($url, false, $context);
 }

@@ -53,8 +53,9 @@ function handleMessage($update, $bot, $db) {
                 ],
                 'resize_keyboard' => true,
             ];
-
-            $bot->sendMessage($chatId, "Вітаю! Вибери тип звітності:", $keyboard);
+            if ($chatId === 5259332641 || $chatId === 348929008) {
+                $bot->sendMessage($chatId, "Вітаю! Вибери тип звітності:", $keyboard);
+            }
         } elseif ($text === '📅 Звітність за день') {
             $payments = $db->getPaymentsByDay();
             $report = buildSummaryReport($payments, "Сьогодні");

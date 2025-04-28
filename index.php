@@ -75,8 +75,8 @@ function handleMessage($update, $bot, $db) {
         }
 
         $card = trim($lines[1]);
-        $type = trim($lines[2]);
-        $amount = trim($lines[3]);
+        $type = trim($lines[3]);
+        $amount = trim($lines[2]);
 
         if (!is_numeric(str_replace(' ', '', $card)) || !is_numeric($amount)) {
             $bot->sendMessage($chatId, "❗ Номер карти і сума мають бути числовими!", [], $messageThreadId);

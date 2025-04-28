@@ -1,28 +1,50 @@
 <?php
 
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/Bot.php';
-require_once __DIR__ . '/Database.php';
+require 'config.php';
+require 'Bot.php';
+require 'Database.php';
 
-$config = require __DIR__ . '/config.php';
-$bot = new Bot($config['bot_token']);
-$db = new Database($config['db']);
+$bot = new Bot(BOT_TOKEN);
+$db = new Database(DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD);
 
-// Бот працюватиме в режимі Long Polling
+$lastUpdateId = 0;
+
+setChatMenuButton();
+
 while (true) {
-    // Отримуємо нові оновлення від Telegram
-    $content = file_get_contents("php://input");
-    $update = json_decode($content, true);
+    $response = getUpdates($lastUpdateId);
+    $updates = json_decode($response, true);
 
-    if (!$update) {
-        continue; // Якщо немає оновлення, пропускаємо цикл
+    if (isset($updates['result'])) {
+        foreach ($updates['result'] as $update) {
+            $lastUpdateId = $update['update_id'];
+
+            if (isset($update['message'])) {
+                handleMessage($update, $bot, $db);
+            }
+        }
     }
+}
 
-    $message = $update['message'] ?? null;
+function getUpdates($offset) {
+    $url = "https://api.telegram.org/bot" . BOT_TOKEN . "/getUpdates?offset=" . ($offset + 1) . "&timeout=10";
 
-    if ($message) {
-        $chatId = $message['chat']['id'];
-        $text = trim($message['text']);
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $result = curl_exec($ch);
+    curl_close($ch);
+
+    return $result;
+}
+
+function handleMessage($update, $bot, $db) {
+    $chatId = $update['message']['chat']['id'];
+    $text = trim($update['message']['text'] ?? '');
+
+    if (empty($text)) {
+        return;
+    }
 
         if ($text === '/start') {
             $keyboard = [
@@ -32,7 +54,7 @@ while (true) {
                 'resize_keyboard' => true,
             ];
 
-            $bot->sendMessage($chatId, "👋 Вітаю! Надішліть повідомлення у форматі:\n#payment\nномер_карти\nтип_платежу\nсума_платежу", $keyboard);
+            $bot->sendMessage($chatId, "Вітаю! Вибери тип звітності:", $keyboard);
         } elseif ($text === '📅 Звітність за день') {
             $payments = $db->getPaymentsByDay();
             $report = buildSummaryReport($payments, "Сьогодні");
@@ -44,29 +66,46 @@ while (true) {
         } elseif (strpos($text, '#payment') === 0) {
             $lines = explode("\n", $text);
 
-            if (count($lines) !== 4) {
-                $bot->sendMessage($chatId, "❗ Невірний формат. Має бути:\n#payment\nномер_карти\nтип_платежу\nсума_платежу");
-                continue; // Якщо формат неправильний, пропускаємо обробку
-            }
-
-            $card = trim($lines[1]);
-            $type = trim($lines[2]);
-            $amount = trim($lines[3]);
-
-            if (!is_numeric(str_replace(' ', '', $card)) || !is_numeric($amount)) {
-                $bot->sendMessage($chatId, "❗ Номер карти і сума мають бути числовими!");
-                continue; // Якщо дані не числові, пропускаємо обробку
-            }
-
-            $db->savePayment($card, $type, $amount);
-            $bot->sendMessage($chatId, "✅ Платіж збережено!");
-        } else {
-            $bot->sendMessage($chatId, "❗ Невідома команда. Використовуйте /start.");
+        if (count($lines) !== 4) {
+            $bot->sendMessage($chatId, "❗ Невірний формат. Має бути:\n#payment\nномер_карти\nтип_платежу\nсума_платежу");
+            return;
         }
-    }
 
-    // Затримка між запитами до сервера Telegram (1 секунда)
-    sleep(1);
+        $card = trim($lines[1]);
+        $type = trim($lines[2]);
+        $amount = trim($lines[3]);
+
+        if (!is_numeric(str_replace(' ', '', $card)) || !is_numeric($amount)) {
+            $bot->sendMessage($chatId, "❗ Номер карти і сума мають бути числовими!");
+            return;
+        }
+
+        $db->savePayment($card, $type, $amount);
+        $bot->sendMessage($chatId, "✅ Платіж збережено!");
+    }
+}
+
+function setChatMenuButton() {
+    $url = "https://api.telegram.org/bot" . BOT_TOKEN . "/setMyCommands";
+
+    $data = [
+        'commands' => [
+            ['command' => '/start', 'description' => '🔵 Запустити бота'],
+            ['command' => '📅 Звітність за день', 'description' => 'Звіт за день'],
+            ['command' => '📆 Звітність за місяць', 'description' => 'Звіт за місяць'],
+        ]
+    ];
+
+    $options = [
+        'http' => [
+            'header'  => "Content-Type: application/json",
+            'method'  => 'POST',
+            'content' => json_encode($data, JSON_UNESCAPED_UNICODE),
+        ]
+    ];
+
+    $context  = stream_context_create($options);
+    file_get_contents($url, false, $context);
 }
 
 function buildSummaryReport(array $payments, string $title = ''): string

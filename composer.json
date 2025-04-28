@@ -1,8 +1,8 @@
 {
-    "name": "fcdniproua/tgbot_151",
+    "name": "fcdniproua/bot_arbitr",
     "autoload": {
         "psr-4": {
-            "Fcdniproua\\Tgbot151\\": "src/"
+            "Fcdniproua\\BotArbitr\\": "src/"
         }
     },
     "authors": [
@@ -11,7 +11,5 @@
             "email": "fcdnipro268@gmail.com"
         }
     ],
-    "require": {
-      "ext-curl": "*"
-    }
+    "require": {}
 }

@@ -9,7 +9,7 @@ class Bot
         $this->apiUrl = "https://api.telegram.org/bot" . $token . "/";
     }
 
-    public function sendMessage($chatId, $text, $replyMarkup = null)
+    public function sendMessage($chatId, $text, $replyMarkup = null, $threadId = null)
     {
         $params = [
             'chat_id' => $chatId,
@@ -19,6 +19,10 @@ class Bot
 
         if ($replyMarkup) {
             $params['reply_markup'] = json_encode($replyMarkup);
+        }
+
+        if ($threadId !== null) {
+            $params['message_thread_id'] = $threadId;
         }
 
         return $this->apiRequest('sendMessage', $params);

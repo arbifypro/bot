@@ -66,7 +66,6 @@ function handleMessage($update, $bot, $db) {
             $report = buildSummaryReport($payments, "Поточний місяць");
             $bot->sendMessage($chatId, $report);
         } elseif (strpos($text, '#payment') === 0) {
-            var_dump($chatId);
             $lines = explode("\n", $text);
 
         if (count($lines) !== 4) {

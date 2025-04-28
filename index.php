@@ -74,7 +74,7 @@ function handleMessage($update, $bot, $db) {
         }
 
         $card = trim($lines[1]);
-        $type = trim($lines[3]);
+        $type = mb_strtoupper(trim($lines[3]));
         $amount = trim($lines[2]);
 
         if (!is_numeric(str_replace(' ', '', $card)) || !is_numeric($amount)) {

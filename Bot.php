@@ -6,7 +6,7 @@ class Bot
 
     public function __construct($token)
     {
-        $this->apiUrl = "https://api.telegram.org/bot$token/";
+        $this->apiUrl = "https://api.telegram.org/bot" . BOT_TOKEN . "/";
     }
 
     public function sendMessage($chatId, $text, $replyMarkup = null)

@@ -4,15 +4,15 @@ class Database
 {
     private $pdo;
 
-    public function __construct($config)
-    {
-        $config = $config['db'];
-        $dsn = "mysql:host={$config['host']};dbname={$config['dbname']};charset={$config['charset']}";
-        $this->pdo = new PDO($dsn, $config['username'], $config['password'], [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        ]);
+    public function __construct() {
+        $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';port=' . DB_PORT;
+        try {
+            $this->pdo = new PDO($dsn, DB_USER, DB_PASSWORD);
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            die('Підключення до бази даних не вдалося: ' . $e->getMessage());
+        }
     }
-
     public function savePayment($card, $type, $amount)
     {
         $stmt = $this->pdo->prepare('INSERT INTO payments (card, type, amount, created_at) VALUES (?, ?, ?, NOW())');

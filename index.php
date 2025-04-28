@@ -40,6 +40,7 @@ function getUpdates($offset) {
 
 function handleMessage($update, $bot, $db) {
     $chatId = $update['message']['chat']['id'];
+    $messageThreadId = $update['message']['message_thread_id'] ?? null;
     $text = trim($update['message']['text'] ?? '');
 
     if (empty($text)) {
@@ -65,10 +66,11 @@ function handleMessage($update, $bot, $db) {
             $report = buildSummaryReport($payments, "Поточний місяць");
             $bot->sendMessage($chatId, $report);
         } elseif (strpos($text, '#payment') === 0) {
+            var_dump($chatId);
             $lines = explode("\n", $text);
 
         if (count($lines) !== 4) {
-            $bot->sendMessage($chatId, "❗ Невірний формат. Має бути:\n#payment\nномер_карти\nтип_платежу\nсума_платежу");
+            $bot->sendMessage($chatId, "❗ Невірний формат. Має бути:\n#payment\nномер_карти\nтип_платежу\nсума_платежу", [], $messageThreadId);
             return;
         }
 
@@ -77,12 +79,12 @@ function handleMessage($update, $bot, $db) {
         $amount = trim($lines[3]);
 
         if (!is_numeric(str_replace(' ', '', $card)) || !is_numeric($amount)) {
-            $bot->sendMessage($chatId, "❗ Номер карти і сума мають бути числовими!");
+            $bot->sendMessage($chatId, "❗ Номер карти і сума мають бути числовими!", [], $messageThreadId);
             return;
         }
 
         $db->savePayment($card, $type, $amount);
-        $bot->sendMessage($chatId, "✅ Платіж збережено!");
+        $bot->sendMessage($chatId, "✅ Платіж збережено!", [], $messageThreadId);
     }
 }
 

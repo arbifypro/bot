@@ -1,8 +1,11 @@
 <?php
 
-const BOT_TOKEN = "7635278801:AAGA1mtSyxjUazxNqA-1wHAVAD7PTo_KSXE";
-const DB_HOST = "hopper.proxy.rlwy.net:30625";
-const DB_PORT = "3306";
-const DB_NAME = "railway";
-const DB_USER = "root";
-const DB_PASSWORD = "XPmBUcIFVTJogvzmUfuXwbmRRxLmzAks";
+return [
+    'bot_token' => getenv('TELEGRAM_BOT_TOKEN'),
+    'db' => [
+        'host' => getenv('DB_HOST') ?: 'localhost',
+        'dbname' => getenv('DB_NAME') ?: 'railway',
+        'user' => getenv('DB_USER') ?: 'root',
+        'password' => getenv('DB_PASSWORD') ?: '',
+    ],
+];

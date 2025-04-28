@@ -20,4 +20,4 @@ COPY . /app
 WORKDIR /app
 
 # Команда для запуску бота
-CMD ["php", "bot.php"]
+CMD ["php", "index.php"]

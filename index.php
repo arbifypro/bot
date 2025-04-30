@@ -12,6 +12,7 @@ $lastUpdateId = 0;
 setChatMenuButton();
 
 while (true) {
+    var_dump(BOT_TOKEN);
     $response = getUpdates($lastUpdateId);
     $updates = json_decode($response, true);
 
